@@ -1,7 +1,7 @@
 import os
 import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras import layers
+from keras import layers
+import numpy as np
 
 DATA_URL = "https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt"
 SEQ_LENGTH = 100
@@ -14,7 +14,7 @@ EPOCHS = 5
 
 def load_data():
     """Download and return raw text for training."""
-    path = keras.utils.get_file("shakespeare.txt", DATA_URL)
+    path = tf.keras.utils.get_file("shakespeare.txt", DATA_URL)
     with open(path, "rb") as f:
         text = f.read().decode("utf-8")
     print(f"Loaded {len(text)} characters of text from {path}")
@@ -56,7 +56,7 @@ def preprocess_data(text):
 
 def build_model(vocab_size):
     """Build a simple character-level language model."""
-    model = keras.Sequential(
+    model = tf.keras.Sequential(
         [
             layers.Embedding(vocab_size, EMBED_DIM, batch_input_shape=[BATCH_SIZE, None]),
             layers.GRU(RNN_UNITS, return_sequences=True, stateful=False),
@@ -66,7 +66,7 @@ def build_model(vocab_size):
 
     model.compile(
         optimizer="adam",
-        loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
         metrics=["accuracy"],
     )
     return model
@@ -79,7 +79,7 @@ def train_model(model, train_dataset, val_dataset):
         validation_data=val_dataset,
         epochs=EPOCHS,
         callbacks=[
-            keras.callbacks.ModelCheckpoint(
+            tf.keras.callbacks.ModelCheckpoint(
                 filepath="rudy_llm_checkpoint.h5",
                 save_best_only=True,
                 monitor="val_loss",
